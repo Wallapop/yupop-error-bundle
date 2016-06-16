@@ -53,7 +53,7 @@ class ExceptionListener
                     ? $exception->getMessage()
                     : Response::$statusTexts[$code];
 
-                throw new HttpException($code, $message);
+                throw new HttpException($code, $message, $exception);
             }
         }
     }
