@@ -52,8 +52,10 @@ class ErrorExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (!empty($config['exceptions'])) {
-            $this->setupExceptions($config['exceptions'], $container);
+        $exceptions = $config['exceptions'];
+        if (!empty($exceptions)) {
+            $priority = $config['priority'];
+            $this->setupExceptions($exceptions, $priority, $container);
         }
     }
 
@@ -75,14 +77,20 @@ class ErrorExtension extends Extension
 
     /**
      * @param array $exceptions
+     * @param integer $priority
      * @param ContainerBuilder $container
      */
-    private function setupExceptions(array $exceptions, ContainerBuilder $container)
+    private function setupExceptions(array $exceptions, $priority, ContainerBuilder $container)
     {
         $this->loadResource($container, 'exceptions.yml');
 
         $definition = $container->getDefinition('shopery.error.exception_listener');
-        $definition->setArguments([$exceptions]);
+        $definition->replaceArgument(0, $exceptions);
+        $definition->addTag('kernel.event_listener', [
+            'event' => 'kernel.exception',
+            'method' => 'onKernelException',
+            'priority' => $priority,
+        ]);
     }
 
     /**
