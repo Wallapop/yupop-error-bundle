@@ -45,6 +45,14 @@ class ExceptionListener
             return;
         }
 
+        $exception = $this->decorateException($exception);
+        if ($exception) {
+            $event->setException($exception);
+        }
+    }
+
+    private function decorateException($exception)
+    {
         foreach ($this->exceptions as $className => $settings) {
             if (is_a($exception, $className)) {
 
@@ -53,7 +61,7 @@ class ExceptionListener
                     ? $exception->getMessage()
                     : Response::$statusTexts[$code];
 
-                throw new HttpException($code, $message, $exception);
+                return new HttpException($code, $message, $exception);
             }
         }
     }
