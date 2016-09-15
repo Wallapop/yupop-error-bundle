@@ -82,6 +82,9 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('priority')
+                    ->defaultValue(0)
+                ->end()
             ->end()
         ;
     }
