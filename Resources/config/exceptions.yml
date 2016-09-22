@@ -1,4 +1,5 @@
 services:
     shopery.error.exception_listener:
         class: Shopery\Bundle\ErrorBundle\Listener\ExceptionListener
-        arguments: ~
+        arguments:
+            - []
