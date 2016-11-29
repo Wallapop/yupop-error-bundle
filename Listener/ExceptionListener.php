@@ -11,6 +11,7 @@
 
 namespace Shopery\Bundle\ErrorBundle\Listener;
 
+use Shopery\Bundle\ErrorBundle\Exception\DecoratedHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class ExceptionListener
 {
     /**
-     * @var array
+     * @var \Exception[]
      */
     private $exceptions;
 
@@ -54,6 +55,7 @@ class ExceptionListener
     private function decorateException($exception)
     {
         foreach ($this->exceptions as $className => $settings) {
+            /** @var \Exception $exception */
             if (is_a($exception, $className)) {
 
                 $code = $settings['code'];
@@ -61,7 +63,7 @@ class ExceptionListener
                     ? $exception->getMessage()
                     : Response::$statusTexts[$code];
 
-                return new HttpException($code, $message, $exception);
+                return new DecoratedHttpException($code, $message, $exception);
             }
         }
     }
