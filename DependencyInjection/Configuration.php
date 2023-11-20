@@ -22,30 +22,19 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @var string
-     */
-    private $alias;
+    private string $alias;
 
-    /**
-     * @param string $alias
-     */
-    public function __construct($alias)
+    public function __construct(string $alias)
     {
         $this->alias = $alias;
     }
 
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder($this->alias);
 
         $this->generateConfiguration(
-            $builder->root($this->alias)
+            $builder->getRootNode()
         );
 
         return $builder;

@@ -11,10 +11,12 @@
 
 namespace Shopery\Bundle\ErrorBundle\Listener;
 
+use Exception;
 use Shopery\Bundle\ErrorBundle\Exception\DecoratedHttpException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 /**
  * Class ExceptionListener
@@ -24,47 +26,41 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class ExceptionListener
 {
     /**
-     * @var \Exception[]
+     * @var Exception[]
      */
-    private $exceptions;
+    private array $exceptions;
 
-    /**
-     * @param array $exceptions
-     */
     public function __construct(array $exceptions)
     {
         $this->exceptions = $exceptions;
     }
 
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event): void
     {
-        $exception = $event->getException();
-        if ($exception instanceof HttpException) {
+        $throwable = $event->getThrowable();
+        if ($throwable instanceof HttpException) {
             return;
         }
 
-        $exception = $this->decorateException($exception);
-        if ($exception) {
-            $event->setException($exception);
+        $throwable = $this->decorateThrowable($throwable);
+        if ($throwable) {
+            $event->setThrowable($throwable);
         }
     }
 
-    private function decorateException($exception)
+    private function decorateThrowable(Throwable $throwable): ?DecoratedHttpException
     {
         foreach ($this->exceptions as $className => $settings) {
-            /** @var \Exception $exception */
-            if (is_a($exception, $className)) {
-
+            if (is_a($throwable, $className)) {
                 $code = $settings['code'];
                 $message = $settings['expose_message']
-                    ? $exception->getMessage()
+                    ? $throwable->getMessage()
                     : Response::$statusTexts[$code];
 
-                return new DecoratedHttpException($code, $message, $exception);
+                return new DecoratedHttpException($code, $message, $throwable);
             }
         }
+
+        return null;
     }
 }
