@@ -3,6 +3,7 @@
 namespace Shopery\Bundle\ErrorBundle\Exception;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 /**
  * Class ExceptionListener
@@ -11,10 +12,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class DecoratedHttpException extends HttpException
 {
-    /**
-     * @return \Exception
-     */
-    public function decorated()
+    public function decorated(): ?Throwable
     {
         return $this->getPrevious();
     }

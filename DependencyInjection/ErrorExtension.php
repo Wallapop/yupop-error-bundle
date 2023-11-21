@@ -28,11 +28,9 @@ class ErrorExtension extends Extension
      *
      * This alias is also the mandatory prefix to use when using YAML.
      *
-     * @return string The alias
-     *
      * @api
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'shopery_error';
     }
@@ -47,7 +45,7 @@ class ErrorExtension extends Extension
      *
      * @api
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -64,10 +62,8 @@ class ErrorExtension extends Extension
      *
      * @param array            $config    An array of configuration values
      * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @return Configuration The configuration
      */
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): Configuration
     {
         $configuration = new Configuration($this->getAlias());
         $container->addObjectResource($configuration);
@@ -75,12 +71,7 @@ class ErrorExtension extends Extension
         return $configuration;
     }
 
-    /**
-     * @param array $exceptions
-     * @param integer $priority
-     * @param ContainerBuilder $container
-     */
-    private function setupExceptions(array $exceptions, $priority, ContainerBuilder $container)
+    private function setupExceptions(array $exceptions, int $priority, ContainerBuilder $container): void
     {
         $this->loadResource($container, 'exceptions.yml');
 
@@ -94,15 +85,13 @@ class ErrorExtension extends Extension
     }
 
     /**
-     * @param ContainerBuilder $container
      * @param mixed $resource
-     * @param string|null $type
      */
-    private function loadResource(ContainerBuilder $container, $resource, $type = null)
+    private function loadResource(ContainerBuilder $container, $resource): void
     {
         $locator = new FileLocator(__DIR__ . '/../Resources/config');
         $loader = new YamlFileLoader($container, $locator);
 
-        $loader->load($resource, $type);
+        $loader->load($resource);
     }
 }
