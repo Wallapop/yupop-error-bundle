@@ -53,9 +53,9 @@ class ExceptionListener
         foreach ($this->exceptions as $className => $settings) {
             if (is_a($throwable, $className)) {
                 $code = $settings['code'];
-                $message = $settings['expose_message']
-                    ? $throwable->getMessage()
-                    : Response::$statusTexts[$code];
+                $exposeMessage = $settings['expose_message'] ?? false;
+                /** @var string $message */
+                $message = $exposeMessage === true ? $throwable->getMessage() : Response::$statusTexts[$code];
 
                 return new DecoratedHttpException($code, $message, $throwable);
             }
